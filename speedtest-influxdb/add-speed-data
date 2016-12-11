@@ -1,0 +1,57 @@
+#!/usr/bin/python3
+
+import subprocess
+import datetime
+from influxdb import InfluxDBClient
+
+cmd = '/usr/bin/speedtest --simple --server 4207'
+host = '<hostname>'
+port = '8086'
+user = 'admin'
+password = '<password>'
+dbname = 'collectd'
+time = datetime.datetime.now()
+
+with open('log-data', 'r') as file:
+    line = file.read().rstrip('\n')
+
+bandwidth = line.split()
+bandwidth_list = [bandwidth[i:i+3] for i in range(0, len(bandwidth), 3)]
+
+for i in range(0, len(bandwidth_list)):
+    date_formatted = datetime.datetime.strptime(bandwidth_list[i][0],'%d%b%Y-%H:%M:%S')
+    #print(date_formatted, bandwidth_list[i][1], bandwidth_list[i][2])
+
+    dbclient = InfluxDBClient(host, port, user, password, dbname)
+
+    json_body = [
+    {
+        "measurement": "isp_bandwidth",
+        "tags": {
+            "type": "download"
+        },
+        "time": date_formatted,
+        "fields": {
+            "value": float(bandwidth_list[i][1])
+
+        }
+    }
+    ]
+
+    dbclient.write_points(json_body)
+
+    json_body = [
+    {
+        "measurement": "isp_bandwidth",
+        "tags": {
+            "type": "upload"
+        },
+        "time": date_formatted,
+        "fields": {
+            "value": float(bandwidth_list[i][2])
+
+        }
+    }
+    ]
+
+    dbclient.write_points(json_body)
