@@ -10,7 +10,8 @@ port = '8086'
 user = 'admin'
 password = '<password>'
 dbname = 'collectd'
-time = time = datetime.datetime.now()
+#time = time = datetime.datetime.now()
+time = time = datetime.datetime.now() + datetime.timedelta(hours=7)
 
 # run command, capture stdout & stderr, decode tuple byte list to tuple string list, split string by space
 p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
