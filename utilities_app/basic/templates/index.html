@@ -21,11 +21,11 @@
   </style>
     <body>
     <h2>Monthly Bill Submission Form</h2>
-    <form method="POST">
+    <form method="POST" action="{{ url_for('index') }}">
     <div class="t-body">
       <div class="t-row">
         <div class="t-cell">
-        <select id="target">
+        <select id="target" name="target">
           <option value="">Select bill provider...</option>
           <option value="CUI">Chestermere Utilities Inc</option>
           <option value="Enmax">Enmax</option>
@@ -36,16 +36,24 @@
         <div class="t-cell"></div>
         <div class="t-cell">
           <div id="CUI" class="inv">
-            Field 1: <input name="CUI.field1"><br>
-            Field 2: <input name="CUI.field2"><br>
-            Field 3: <input name="CUI.field3"><br>
+            Garbage: <input name="CUI.garbage"><br>
+            Recycle Center: <input name="CUI.recycle"><br>
+            Residential Storm: <input name="CUI.rstorm"><br>
+            Residential Sewer: <input name="CUI.rsewer"><br>
+            Residential Water: <input name="CUI.rwater"><br>
+            Water Usage: <input name="CUI.wusage"><br>
+            Water Consumption Charge: <input name="CUI.wcost"><br>
+            Sewer Consumption Charge: <input name="CUI.scost"><br>
+            Total Cost: <input name="CUI.tcost"><br>
             <br><br>
             <input type="submit" value="Save to database">
           </div>
           <div id="Enmax" class="inv">
-            Field 1: <input name="Enmax.field1"><br>
-            Field 2: <input name="Enmax.field2"><br>
-            Field 3: <input name="Enmax.field3"><br>
+            Electricity Usage: <input name="Enmax.eusage"><br>
+            Natural Gas Usage: <input name="Enmax.ngusage"><br>
+            Electricity Cost: <input name="Enmax.ecost"><br>
+            Natural Gas Cost: <input name="Enmax.ngcost"><br>
+            Total Cost: <input name="Enmax.tcost"><br>
             <br><br>
             <input type="submit" value="Save to database">
           </div>
