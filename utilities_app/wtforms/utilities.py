@@ -1,5 +1,7 @@
 from wtforms import Form, BooleanField, StringField, PasswordField, validators
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, flash, redirect, session
+
+SESSION_TYPE = 'filesystem'
 
 app = Flask(__name__)
 
@@ -19,6 +21,15 @@ def register():
     if request.method == 'POST' and form.validate():
         user = (form.username.data + form.email.data + form.password.data)
         #db_session.add(user)
-        #flash('Thanks for registering')
-        #return redirect(url_for('login'))
+        flash('Thanks for registering')
+        return redirect(url_for('login'))
     return render_template('register.html', form=form)
+
+if __name__ == "__main__":
+    app.secret_key = 'super secret key'
+    app.config['SESSION_TYPE'] = 'filesystem'
+
+    sess.init_app(app)
+
+    app.debug = True
+    app.run()
