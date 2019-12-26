@@ -1,5 +1,14 @@
+#!/usr/bin/python3
+
+import subprocess, time
+from influxdb import InfluxDBClient
 from flask import Flask, request, render_template, url_for, flash, redirect
-import time, sys
+
+host = '<hostname>'
+port = '8086'
+user = 'admin'
+password = '<password>'
+dbname = 'utilities_new'
 
 app = Flask(__name__)
 
@@ -55,6 +64,25 @@ def index_post():
         utilities_list = list(utilities)
         utilities_list.append(EnmaxEpoch)
         print(utilities_list)
+
+        dbclient = InfluxDBClient(host, port, user, password, dbname)
+        
+        json_body = [
+        {
+            "measurement": "isp_bandwidth",
+            "tags": {
+                "type": "latency"
+            },
+            "time": time,
+            "fields": {
+                "value": float(bandwidth[1])
+        
+            }
+        }
+        ]
+        
+        dbclient.write_points(json_body)
+
         return 'OK'
 
     elif provider == 'CUI':
