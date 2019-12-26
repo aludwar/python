@@ -1,4 +1,5 @@
 from flask import Flask, request, render_template, url_for, flash, redirect
+import time
 
 app = Flask(__name__)
 
@@ -38,13 +39,36 @@ def index():
 
 @app.route('/', methods=['POST'])
 def index_post():
-    provider = request.form['target']
-    EnmaxField1 = request.form['Enmax.eusage']
-    EnmaxField2 = request.form['Enmax.ngusage']
-    EnmaxField3 = request.form['Enmax.ecost']
-    EnmaxField4 = request.form['Enmax.ngcost']
-    EnmaxField5 = request.form['Enmax.tcost']
-    fields = (EnmaxField1 + EnmaxField2 + EnmaxField3)
-    return(str(provider))
+    provider = str(request.form['target'])
+
+    if provider == 'Enmax':
+      EnmaxEusage = request.form['Enmax.eusage']
+      EnmaxNGusage = request.form['Enmax.ngusage']
+      EnmaxEcost= request.form['Enmax.ecost']
+      EnmaxNGcost = request.form['Enmax.ngcost']
+      EnmaxTcost = request.form['Enmax.tcost']
+      EnmaxEpoch = int(time.time())
+      utilities = get_enmax_floats(EnmaxEusage, EnmaxNGusage, EnmaxEcost, EnmaxNGcost, EnmaxTcost)
+      utilities_list = list(utilities)
+      utilities_list.append(EnmaxEpoch)
+      print(utilities_list)
+      return 'OK'
+
+    elif provider == 'CUI':
+      CUIgarbage = request.form['CUI.garbage']
+      CUIrecycle = request.form['CUI.recycle']
+      CUIrstorm = request.form['CUI.rstorm']
+      CUIrsewer = request.form['CUI.rsewer']
+      CUIrwater = request.form['CUI.rwater']
+      CUIwusage = request.form['CUI.wusage']
+      CUIwcost = request.form['CUI.wcost']
+      CUIscost = request.form['CUI.scost']
+      CUItcost = request.form['CUI.tcost']
+      CUIEpoch = int(time.time()) 
+      utilities = get_cui_floats(CUIgarbage, CUIrecycle, CUIrstorm, CUIrsewer, CUIrwater, CUIwusage, CUIwcost, CUIscost, CUItcost)
+      utilities_list = list(utilities)
+      utilities_list.append(CUIEpoch)
+      print(utilities_list)
+      return 'OK'
 
 
