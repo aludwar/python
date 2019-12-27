@@ -1,6 +1,8 @@
 #!/usr/bin/python3
 
-import subprocess, time
+import subprocess, datetime, time
+from datetime import timedelta
+from decimal import *
 from influxdb import InfluxDBClient
 from flask import Flask, request, render_template, url_for, flash, redirect
 
@@ -12,8 +14,15 @@ dbname = 'utilities_new'
 
 app = Flask(__name__)
 
+def subtract_one_month(dt0):
+    dt1 = dt0.replace(day=1)
+    dt2 = dt1 - timedelta(days=1)
+    dt3 = dt2.replace(day=1)
+    return dt3
+
 def get_enmax_floats(f1,f2,f3,f4,f5):
   try:
+    getcontext().prec = 2
     n1 = float(f1)
     n2 = float(f2)
     n3 = float(f3)
@@ -56,27 +65,37 @@ def index_post():
       EnmaxEcost= request.form['Enmax.ecost']
       EnmaxNGcost = request.form['Enmax.ngcost']
       EnmaxTcost = request.form['Enmax.tcost']
-      EnmaxEpoch = int(time.time())
-      utilities = get_enmax_floats(EnmaxEusage, EnmaxNGusage, EnmaxEcost, EnmaxNGcost, EnmaxTcost)
-      if utilities == 500:
+      EnmaxYear = str(subtract_one_month(datetime.datetime.now()))
+      EnmaxYear = int(EnmaxYear[0:4])
+
+      try:
+        EnmaxMonth = int(request.form['emonth'])
+      except ValueError:
+        print("Please select a month")
+        return 'Please select a month'
+
+      dt = datetime.datetime(year=EnmaxYear, month=EnmaxMonth, day=15)
+      EnmaxEpoch = time.mktime(dt.timetuple())
+      utilities_tuple = get_enmax_floats(EnmaxEusage, EnmaxNGusage, EnmaxEcost, EnmaxNGcost, EnmaxTcost)
+      if utilities_tuple == 500:
         return 'Input should be numbers. Try again.'
       else:
-        utilities_list = list(utilities)
-        utilities_list.append(EnmaxEpoch)
-        print(utilities_list)
-
         dbclient = InfluxDBClient(host, port, user, password, dbname)
         
         json_body = [
         {
-            "measurement": "isp_bandwidth",
+            "measurement": "utilities",
             "tags": {
-                "type": "latency"
+                "vendor": "enmax"
             },
-            "time": time,
+            "time": EnmaxEpoch,
             "fields": {
-                "value": float(bandwidth[1])
-        
+                "electricity_usage": (utilities_tuple[0]),
+                "natural_gas_usage": (utilities_tuple[1]),
+                "electrical_cost": (utilities_tuple[2]),
+                "natural_gas_cost": (utilities_tuple[3]),
+                "carbon_levy": Decimal(0),
+                "total_cost": (utilities_tuple[4]),
             }
         }
         ]
@@ -96,11 +115,11 @@ def index_post():
       CUIscost = request.form['CUI.scost']
       CUItcost = request.form['CUI.tcost']
       CUIEpoch = int(time.time()) 
-      utilities = get_cui_floats(CUIgarbage, CUIrecycle, CUIrstorm, CUIrsewer, CUIrwater, CUIwusage, CUIwcost, CUIscost, CUItcost)
-      if utilities == 500:
+      utilities_tuple = get_cui_floats(CUIgarbage, CUIrecycle, CUIrstorm, CUIrsewer, CUIrwater, CUIwusage, CUIwcost, CUIscost, CUItcost)
+      if utilities_tuple == 500:
         return 'Input should be numbers. Try again.'
       else:
-        utilities_list = list(utilities)
+        utilities_list = list(utilities_tuple)
         utilities_list.append(CUIEpoch)
         print(utilities_list)
         return 'OK'
