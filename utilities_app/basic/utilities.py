@@ -6,10 +6,10 @@ from decimal import *
 from influxdb import InfluxDBClient
 from flask import Flask, request, render_template, url_for, flash, redirect
 
-host = '<hostname>'
+host = '10.0.0.15'
 port = '8086'
 user = 'admin'
-password = '<password>'
+password = 'admin'
 dbname = 'utilities_new'
 
 app = Flask(__name__)
@@ -75,7 +75,7 @@ def index_post():
         return 'Please select a month'
 
       dt = datetime.datetime(year=EnmaxYear, month=EnmaxMonth, day=15)
-      EnmaxEpoch = time.mktime(dt.timetuple())
+      EnmaxEpoch = int(time.mktime(dt.timetuple())) * int(1000000000)
       utilities_tuple = get_enmax_floats(EnmaxEusage, EnmaxNGusage, EnmaxEcost, EnmaxNGcost, EnmaxTcost)
       if utilities_tuple == 500:
         return 'Input should be numbers. Try again.'
@@ -94,7 +94,7 @@ def index_post():
                 "natural_gas_usage": (utilities_tuple[1]),
                 "electrical_cost": (utilities_tuple[2]),
                 "natural_gas_cost": (utilities_tuple[3]),
-                "carbon_levy": Decimal(0),
+                "carbon_levy": 0.0,
                 "total_cost": (utilities_tuple[4]),
             }
         }
@@ -114,14 +114,47 @@ def index_post():
       CUIwcost = request.form['CUI.wcost']
       CUIscost = request.form['CUI.scost']
       CUItcost = request.form['CUI.tcost']
-      CUIEpoch = int(time.time()) 
+      CUIYear = str(subtract_one_month(datetime.datetime.now()))
+      CUIYear = int(CUIYear[0:4])
+
+      try:
+        CUIMonth = int(request.form['cuimonth'])
+      except ValueError:
+        print("Please select a month")
+        return 'Please select a month'
+
+      dt = datetime.datetime(year=CUIYear, month=CUIMonth, day=15)
+      CUIEpoch = int(time.mktime(dt.timetuple())) * int(1000000000)
       utilities_tuple = get_cui_floats(CUIgarbage, CUIrecycle, CUIrstorm, CUIrsewer, CUIrwater, CUIwusage, CUIwcost, CUIscost, CUItcost)
       if utilities_tuple == 500:
         return 'Input should be numbers. Try again.'
       else:
-        utilities_list = list(utilities_tuple)
-        utilities_list.append(CUIEpoch)
-        print(utilities_list)
+        dbclient = InfluxDBClient(host, port, user, password, dbname)
+        
+        json_body = [
+        {
+            "measurement": "utilities",
+            "tags": {
+                "vendor": "cui"
+            },
+            "time": CUIEpoch,
+            "fields": {
+                "garbage": (utilities_tuple[0]),
+                "lifecycle": 0.0,
+                "recycle_centre": (utilities_tuple[1]),
+                "res_storm": (utilities_tuple[2]),
+                "res_sewer": (utilities_tuple[3]),
+                "res_water": (utilities_tuple[4]),
+                "water_usage": (utilities_tuple[5]),
+                "water_consume_charge": (utilities_tuple[6]),
+                "sewer_consume_charge": (utilities_tuple[7]),
+                "total_cost": (utilities_tuple[8]),
+            }
+        }
+        ]
+        
+        dbclient.write_points(json_body)
+
         return 'OK'
 
 
