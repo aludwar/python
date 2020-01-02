@@ -6,6 +6,5 @@ I realise this is pretty rudimentary and probably could be accomplished in a sim
 
 Here's an example:
 
-![alt text](https://github.com/aludwar/python/utilities_app/raw/master/src/common/images/icon48.png "Logo Title Text 1")
-
+![alt text](https://github.com/aludwar/python/blob/master/utilities_app/utilities.png "Example utilities graph")
 
