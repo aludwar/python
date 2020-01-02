@@ -1,0 +1,110 @@
+<html>
+  <style>
+.inv {
+    display: none;
+}
+.t-body {
+  display: table;
+}
+
+.t-row {
+  display: table-row;
+}
+
+.t-cell {
+  display: table-cell;
+}
+
+.fw {
+  width: 100px;
+}                    
+  </style>
+    <body>
+    <h2>Monthly Bill Submission Form</h2>
+    <form method="POST" action="{{ url_for('index') }}">
+    <div class="t-body">
+      <div class="t-row">
+        <div class="t-cell">
+        <select id="target" name="target">
+          <option value="">Select bill provider...</option>
+          <option value="CUI">Chestermere Utilities Inc</option>
+          <option value="Enmax">Enmax</option>
+        <select>
+        </div>
+      </div>
+      <div class="t-row">
+        <div class="t-cell"></div>
+        <div class="t-cell">
+          <div id="CUI" class="inv">
+            Garbage: <input name="CUI.garbage"><br>
+            Recycle Center: <input name="CUI.recycle"><br>
+            Residential Storm: <input name="CUI.rstorm"><br>
+            Residential Sewer: <input name="CUI.rsewer"><br>
+            Residential Water: <input name="CUI.rwater"><br>
+            Water Usage: <input name="CUI.wusage"><br>
+            Water Consumption Charge: <input name="CUI.wcost"><br>
+            Sewer Consumption Charge: <input name="CUI.scost"><br>
+            Total Cost: <input name="CUI.tcost"><br>
+            Billing Month: <select id="cuimonth" name="cuimonth">
+                <option value="">Select month...</option>
+                <option value="01">January</option>
+                <option value="02">February</option>
+                <option value="03">March</option>
+                <option value="04">April</option>
+                <option value="05">May</option>
+                <option value="06">June</option>
+                <option value="07">July</option>
+                <option value="08">August</option>
+                <option value="09">September</option>
+                <option value="10">October</option>
+                <option value="11">November</option>
+                <option value="12">December</option>
+              </select><br>
+            <br><br>
+            <input type="submit" value="Save to database">
+          </div>
+          <div id="Enmax" class="inv">
+            Electricity Usage: <input name="Enmax.eusage"><br>
+            Natural Gas Usage: <input name="Enmax.ngusage"><br>
+            Electricity Cost: <input name="Enmax.ecost"><br>
+            Natural Gas Cost: <input name="Enmax.ngcost"><br>
+            Total Cost: <input name="Enmax.tcost"><br>
+            Billing Month: <select id="emonth" name="emonth">
+                <option value="">Select month...</option>
+                <option value="01">January</option>
+                <option value="02">February</option>
+                <option value="03">March</option>
+                <option value="04">April</option>
+                <option value="05">May</option>
+                <option value="06">June</option>
+                <option value="07">July</option>
+                <option value="08">August</option>
+                <option value="09">September</option>
+                <option value="10">October</option>
+                <option value="11">November</option>
+                <option value="12">December</option>
+              </select><br>
+            <br><br>
+            <input type="submit" value="Save to database">
+          </div>
+        </div>
+      </div>
+    </div>  
+    </form>
+    <script>
+        document
+            .getElementById('target')
+            .addEventListener('change', function () {
+                'use strict';
+                var vis = document.querySelector('.vis'),   
+                    target = document.getElementById(this.value);
+                if (vis !== null) {
+                    vis.className = 'inv';
+                }
+                if (target !== null ) {
+                    target.className = 'vis';
+                }
+        });
+    </script>
+    </body>
+</html>
