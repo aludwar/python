@@ -6,10 +6,10 @@ from decimal import *
 from influxdb import InfluxDBClient
 from flask import Flask, request, render_template, url_for, flash, redirect
 
-host = '10.0.0.15'
+host = '<hostname>'
 port = '8086'
 user = 'admin'
-password = 'admin'
+password = '<password>'
 dbname = 'utilities_new'
 
 app = Flask(__name__)
